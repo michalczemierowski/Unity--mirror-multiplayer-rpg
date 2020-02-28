@@ -12184,17 +12184,9 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_IsSelectable: 1
-  m_SelectedFaces: 40000000
-  m_SelectedEdges:
-  - a: 256
-    b: 257
-  - a: 258
-    b: 256
-  - a: 257
-    b: 259
-  - a: 259
-    b: 258
-  m_SelectedVertices: 00010000010100000201000003010000
+  m_SelectedFaces: 
+  m_SelectedEdges: []
+  m_SelectedVertices: 
 --- !u!23 &204447526
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -13708,7 +13700,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh14632
+  m_Name: pb_Mesh14636
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2

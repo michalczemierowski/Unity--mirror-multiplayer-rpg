@@ -60,7 +60,9 @@ namespace MULTIPLAYER_GAME.Entities
 
         private Entity target;
         private Vector3 lastTargetPosinion;
+
         private float localCooldown;
+        private float movementClickCooldown;
 
         public bool isSprinting { get; private set; }
         public bool isRunning { get; private set; }
@@ -135,6 +137,9 @@ namespace MULTIPLAYER_GAME.Entities
             isWalking = isRunning && Input.GetKey(KeyCode.LeftControl);
 
             agent.speed = Speed;
+
+            if (movementClickCooldown > 0)
+                movementClickCooldown -= Time.deltaTime;
         }
 
         public override void LateUpdate()
@@ -169,7 +174,9 @@ namespace MULTIPLAYER_GAME.Entities
 
         public void HandleInput()
         {
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonDown(1)) movementClickCooldown = 0;
+
+            if (Input.GetMouseButton(1) && movementClickCooldown <= 0)
             {
                 RaycastHit hit;
                 Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
@@ -179,6 +186,8 @@ namespace MULTIPLAYER_GAME.Entities
                     positionSynchronization.CmdSetDestination(hit.point);
                 }
                 target = null;
+
+                movementClickCooldown = 0.25f;
             }
             if (Input.GetMouseButtonDown(0))
             {

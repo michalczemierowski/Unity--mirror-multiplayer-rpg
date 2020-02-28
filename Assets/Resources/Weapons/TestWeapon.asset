@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 0
   icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  Damage: 0.25
+  Damage: 1
   attackRange: 10
-  attackCooldown: 0.5
-  cantMoveTime: 0.5
+  attackCooldown: 0.05
+  cantMoveTime: 0
   animationTrigger: Attack
   isRanged: 1
   bulletPrefab: {fileID: 7083525882554642314, guid: 244280c53ab07a746882b3cb657ae6a3,

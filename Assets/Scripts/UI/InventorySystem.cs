@@ -20,6 +20,8 @@ namespace MULTIPLAYER_GAME.Inventory
         public Item[,] Inventory;
         public Item testItem;
 
+        public float dropItemPositionX { get; private set; }
+
         #endregion
 
         #region Serializable variables
@@ -77,6 +79,7 @@ namespace MULTIPLAYER_GAME.Inventory
             }
 
             inventoryCellPanel.sizeDelta = new Vector2(inventorySize.x * (cellSize.x + spacing.x) - 2 * spacing.x + 2 * padding.x, inventorySize.y * (cellSize.y + spacing.y) - 2 * spacing.y + 2 * padding.y);
+            dropItemPositionX = inventoryCellPanel.position.x - inventoryCellPanel.sizeDelta.x;
         }
 
         private void Update()
@@ -164,6 +167,13 @@ namespace MULTIPLAYER_GAME.Inventory
                 return true;
             }
             return false;
+        }
+
+        public static bool DropItem(Vector2Int index)
+        {
+            Instance.inventoryUICells[index.x, index.y].RemoveItem();
+            Instance.Inventory[index.x, index.y] = null;
+            return true;
         }
 
         private void SwapItems(Vector2Int positionOne, Vector2Int positionTwo)

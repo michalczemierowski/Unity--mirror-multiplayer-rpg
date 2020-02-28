@@ -30,7 +30,7 @@ namespace MULTIPLAYER_GAME.Inventory.UI
 
         public void SetItem(Item item, int count)
         {
-            if(item == null)
+            if (item == null)
             {
                 itemIcon.sprite = null;
                 itemName.text = string.Empty;
@@ -40,6 +40,16 @@ namespace MULTIPLAYER_GAME.Inventory.UI
                 AddCount(count);
             else
                 InsertItem(item, count);
+        }
+
+        public void RemoveItem()
+        {
+            itemIcon.sprite = null;
+            itemName.text = string.Empty;
+            itemCount.text = string.Empty;
+
+            item = null;
+            count = 0;
         }
 
         private void InsertItem(Item item, int count)
@@ -75,7 +85,12 @@ namespace MULTIPLAYER_GAME.Inventory.UI
         public void OnEndDrag(PointerEventData eventData)
         {
             GameObject currentRaycast = eventData.pointerCurrentRaycast.gameObject;
-            if (currentRaycast && currentRaycast.tag == "InventorySlot")
+            if (eventData.position.x < InventorySystem.Instance.dropItemPositionX)
+            {
+                InventorySystem.DropItem(indexPosition);
+                transform.position = startPosition;
+            }
+            else if (currentRaycast && currentRaycast.tag == "InventorySlot")
             {
                 InventorySystem.InventoryCellSwap(indexPosition, currentRaycast.gameObject.GetComponent<InventoryUICell>().indexPosition);
 
