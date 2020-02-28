@@ -28,31 +28,32 @@ namespace MULTIPLAYER_GAME.Entities
         [Header("Attributes")]
         public float Health = 1;
 
-        public event EventHandler<Animation.AnimationState> OnAnimationStateChangeEvent;
-        public event EventHandler<float> OnDamageEvent;
-        public event EventHandler<float> OnHealEvent;
+        public delegate void OnDamageDelegate(int attackerID, float value);
+        public delegate void OnHealDelegate(float value);
+        [SyncEvent]
+        public event OnDamageDelegate EventOnDamage;
+        [SyncEvent]
+        public event OnHealDelegate EventOnHeal;
 
         [HideInInspector] public Animator m_Animator;
 
+        public bool isRunning { get; protected set; }
+
         #region Damage
 
-        public virtual void SetHealth(float Health)
-        {
-            // events
-            if (Health < this.Health)
-                OnDamageEvent?.Invoke(this, this.Health - Health);
-            else if (Health > this.Health)
-                OnHealEvent?.Invoke(this, Health - this.Health);
-
-            this.Health = Health;
-        }
-
         // SERVER ONLY
+        [Server]
         public virtual void Damage(int attackerID, float value)
         {
             Health -= value;
             AddExperience(attackerID, 10);
-            MessageSystem.AddMessage($"DAMAGE ENTITY  ID = [{ID}]  DAMAGE = [{value}]  HEALTH = [{Health}]");
+            EventOnDamage(attackerID, value);
+        }
+
+        public virtual void Heal(float value)
+        {
+            Health += value;
+            EventOnHeal(value);
         }
 
         private void AddExperience(int attackerID, int experience)
@@ -77,11 +78,6 @@ namespace MULTIPLAYER_GAME.Entities
             m_Animator.SetTrigger(name);
         }
 
-        public virtual void SetState(Animation.AnimationState state)
-        {
-            OnAnimationStateChangeEvent.Invoke(this, state);
-        }
-
         #endregion
 
         public virtual void Start()
@@ -97,6 +93,7 @@ namespace MULTIPLAYER_GAME.Entities
         {
             if (m_Animator != null)
             {
+                isRunning = agent.velocity != Vector3.zero;
                 m_Animator.SetFloat("Speed", Mathf.Max(Mathf.Abs(agent.velocity.x), Mathf.Abs(agent.velocity.z)));
             }
         }

@@ -9,6 +9,5 @@ namespace MULTIPLAYER_GAME.Interfaces
     {
         void SetTrigger(string name);
         void PlayAnimation(string name);
-        void SetState(Animation.AnimationState state);
     }
 }

@@ -15,7 +15,8 @@ namespace MULTIPLAYER_GAME.Systems
     {
         public static ObjectDatabase Instance;
 
-        private int indexID;
+        [SyncVar]
+        public int indexID;
 
         [HideInInspector] public bool haveEntitiesChanged = true;
         private Dictionary<int, Entity> allEntities = new Dictionary<int, Entity>();
@@ -102,9 +103,12 @@ namespace MULTIPLAYER_GAME.Systems
         }
         public static void RemoveEntity(int entityID)
         {
-            Instance.allEntities.Remove(entityID);
+            if (Instance.allEntities.ContainsKey(entityID))
+            {
+                Instance.allEntities.Remove(entityID);
 
-            Instance.haveEntitiesChanged = true;
+                Instance.haveEntitiesChanged = true;
+            }
         }
 
         public static EntitySpawnPosition GetRandomSpawnpoint()

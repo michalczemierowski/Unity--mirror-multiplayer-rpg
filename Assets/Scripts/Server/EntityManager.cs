@@ -32,23 +32,27 @@ namespace MULTIPLAYER_GAME.Server
         {
             base.OnStartServer();
 
-            InvokeRepeating("FindEntityDestination", 2, 2);
-
-            for (int i = 0; i < 100; i++)
+            if (isServer)
             {
-                Vector3 spawnPosition = ObjectDatabase.GetRandomSpawnpoint().GetPosition();
-                GameObject entity = Instantiate(ObjectDatabase.GetEntityPrefabByID(0).gameObject, spawnPosition, Quaternion.identity);
-                ObjectDatabase.AddEntity(entity.GetComponent<Entity>());
+                InvokeRepeating("FindEntityDestination", 2, 2);
 
-                NetworkServer.Spawn(entity);
+                for (int i = 0; i < 100; i++)
+                {
+                    Vector3 spawnPosition = ObjectDatabase.GetRandomSpawnpoint().GetPosition();
+                    GameObject entity = Instantiate(ObjectDatabase.GetEntityPrefabByID(0).gameObject, spawnPosition, Quaternion.identity);
+                    ObjectDatabase.AddEntity(entity.GetComponent<Entity>());
+
+                    NetworkServer.Spawn(entity);
+                }
             }
         }
 
         #endregion
 
+        [Server]
         private void FindEntityDestination()
         {
-            if(ObjectDatabase.Instance.haveEntitiesChanged)
+            if (ObjectDatabase.Instance.haveEntitiesChanged)
             {
                 mobs = ObjectDatabase.GetAllEntities<Mob>();
             }

@@ -37,21 +37,13 @@ namespace MULTIPLAYER_GAME.Client
                     // bullet
                     BulletController bulletController = Instantiate(weapon.bulletPrefab, transform.position, Quaternion.identity).GetComponent<BulletController>();
 
-                    bulletController.weaponController = this;
+                    bulletController.isServer = true;
                     bulletController.attackerID = player.ID;
                     bulletController.target = targetEntity.transform;
                     bulletController.damage = weapon.Damage;
                     bulletController.speed = weapon.bulletSpeed;
                 }
             }
-        }
-
-        [ClientRpc]
-        public void RpcSetEntityHealth(int entityID, float Health)
-        {
-            Entity targetEntity = ObjectDatabase.GetEntity(entityID);
-            if (targetEntity)
-                targetEntity.SetHealth(Health);
         }
 
         [ClientRpc]

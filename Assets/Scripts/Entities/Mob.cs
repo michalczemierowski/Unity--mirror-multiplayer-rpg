@@ -3,6 +3,7 @@
  * https://github.com/michalczemierowski
 */
 
+using System;
 using Mirror;
 using MULTIPLAYER_GAME.Interfaces;
 using MULTIPLAYER_GAME.Systems;
@@ -14,22 +15,28 @@ namespace MULTIPLAYER_GAME.Entities
         public override void Start()
         {
             base.Start();
+
+            EventOnDamage += OnDamage;
+            EventOnHeal += OnHeal;
         }
 
-        // SERVER ONLY
-        public override void Damage(int attackerID, float value)
+        private void OnHeal(float value)
         {
-            base.Damage(attackerID, value);
+            print("ON HEAL");
+        }
 
+        private void OnDamage(int attackerID, float value)
+        {
             if (Health <= 0)
             {
                 Destroy(gameObject);
             }
         }
 
-        public override void SetHealth(float Health)
+        // SERVER ONLY
+        public override void Damage(int attackerID, float value)
         {
-            base.SetHealth(Health);
+            base.Damage(attackerID, value);
 
             if (Health <= 0)
             {

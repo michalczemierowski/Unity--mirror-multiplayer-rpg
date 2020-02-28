@@ -26,10 +26,9 @@ public class SERVERNetworkManager : NetworkManager
     {
         base.OnClientConnect(conn);
 
-        // you can send the message here, or wherever else you want
         CreateCharacterMessage characterMessage = new CreateCharacterMessage
         {
-            ID = ObjectDatabase.NextEntityID()
+            ID = 0
         };
 
         conn.Send(characterMessage);
@@ -37,9 +36,12 @@ public class SERVERNetworkManager : NetworkManager
 
     private void OnCreateCharacter(NetworkConnection conn, CreateCharacterMessage createCharacterMessage)
     {
-        GameObject gameobject = Instantiate(playerPrefab);
-        ObjectDatabase.AddEntity(gameobject.GetComponent<Player>());
+        Player player = Instantiate(playerPrefab).GetComponent<Player>();
+        //player.ID = createCharacterMessage.ID;
 
-        NetworkServer.AddPlayerForConnection(conn, gameobject);
+        ObjectDatabase.AddEntity(player);
+        Debug.Log("ADD ENTITY " + player.ID + " " + createCharacterMessage.ID);
+
+        NetworkServer.AddPlayerForConnection(conn, player.gameObject);
     }
 }

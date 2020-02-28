@@ -10,7 +10,7 @@ namespace MULTIPLAYER_GAME.Client
 {
     public class BulletController : MonoBehaviour
     {
-        [HideInInspector] public WeaponController weaponController;
+        [HideInInspector] public bool isServer;
         [HideInInspector] public int attackerID;
 
         public Transform target;
@@ -31,11 +31,10 @@ namespace MULTIPLAYER_GAME.Client
             }
             else
             {
-                if (weaponController)
+                if (isServer)
                 {
                     Entity entity = target.GetComponent<Entity>();
                     entity.Damage(attackerID, damage);
-                    weaponController.RpcSetEntityHealth(entity.ID, entity.Health);
                 }
 
                 Destroy(gameObject);

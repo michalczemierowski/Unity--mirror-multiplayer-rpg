@@ -64,9 +64,10 @@ namespace MULTIPLAYER_GAME.Entities
         private float localCooldown;
         private float movementClickCooldown;
 
-        public bool isSprinting { get; private set; }
-        public bool isRunning { get; private set; }
-        public bool isWalking{ get; private set; }
+        [SyncVar]
+        public bool isSprinting;
+        [SyncVar]
+        public bool isWalking;
 
         #region Unity methods
 
@@ -75,9 +76,8 @@ namespace MULTIPLAYER_GAME.Entities
             base.Start();
 
             // entity events
-            OnAnimationStateChangeEvent += OnAnimationStateChange;
-            OnDamageEvent += OnDamage;
-            OnHealEvent += OnHeal;
+            EventOnDamage += OnDamage;
+            EventOnHeal += OnHeal;
 
             if (!isLocalPlayer)
             {
@@ -120,26 +120,35 @@ namespace MULTIPLAYER_GAME.Entities
 
         private void Update()
         {
-            if (!isLocalPlayer) return;
-
-            HandleInput();
-            if (target != null)
+            if (isLocalPlayer)
             {
-                if (localCooldown <= 0 && Vector3.Distance(target.transform.position, transform.position) <= usedWeapon.attackRange)
-                    Attack(target);
+                HandleInput();
+                if (target != null)
+                {
+                    if (localCooldown <= 0 && Vector3.Distance(target.transform.position, transform.position) <= usedWeapon.attackRange)
+                        Attack(target);
+                }
+
+                if (localCooldown > 0)
+                    localCooldown -= Time.deltaTime;
+
+                bool nIsSprinting = isRunning && Input.GetKey(KeyCode.LeftShift);
+                bool nIsWalking = isRunning && Input.GetKey(KeyCode.LeftControl);
+                if(nIsSprinting != isSprinting || nIsWalking != isWalking)
+                    CmdSetInput(nIsSprinting, nIsWalking);
+
+                if (movementClickCooldown > 0)
+                    movementClickCooldown -= Time.deltaTime;
             }
 
-            if(localCooldown > 0)
-                localCooldown -= Time.deltaTime;
-
-            isRunning = agent.velocity != Vector3.zero;
-            isSprinting = isRunning && Input.GetKey(KeyCode.LeftShift);
-            isWalking = isRunning && Input.GetKey(KeyCode.LeftControl);
-
             agent.speed = Speed;
+        }
 
-            if (movementClickCooldown > 0)
-                movementClickCooldown -= Time.deltaTime;
+        [Command]
+        private void CmdSetInput(bool isSprinting, bool isWalking)
+        {
+            this.isSprinting = isSprinting;
+            this.isWalking = isWalking;
         }
 
         public override void LateUpdate()
@@ -155,19 +164,14 @@ namespace MULTIPLAYER_GAME.Entities
         #region Event listeners
 
         // EVENT LISTENERS WILL RUN ON NOT LOCAL PLAYERS TOO
-        private void OnHeal(object sender, float e)
+        private void OnHeal(float value)
         {
             Debug.Log("ON HEAL", this);
         }
 
-        private void OnDamage(object sender, float e)
+        private void OnDamage(int attackerID, float value)
         {
             Debug.Log("ON DAMAGE", this);
-        }
-
-        private void OnAnimationStateChange(object sender, Animation.AnimationState e)
-        {
-            Debug.Log("ON ANIMATION STATE CHANGE", this);
         }
 
         #endregion
@@ -342,32 +346,32 @@ namespace MULTIPLAYER_GAME.Entities
 
         #endregion
 
-        public void SetPath(Vector3 destination)
-        {
-            NavMeshPath navMeshPath = new NavMeshPath();
-            agent.CalculatePath(destination, navMeshPath);
+        //public void SetPath(Vector3 destination)
+        //{
+        //    NavMeshPath navMeshPath = new NavMeshPath();
+        //    agent.CalculatePath(destination, navMeshPath);
 
-            StartCoroutine(DrawPath());
-            StartCoroutine("WaitForPathFinish");
-        }
+        //    StartCoroutine(DrawPath());
+        //    StartCoroutine("WaitForPathFinish");
+        //}
 
-        private IEnumerator WaitForPathFinish()
-        {
-            yield return null;
-            yield return new WaitUntil(() => agent.remainingDistance <= agent.stoppingDistance);
-            PathRenderer.ResetPath();
-        }
+        //private IEnumerator WaitForPathFinish()
+        //{
+        //    yield return null;
+        //    yield return new WaitUntil(() => agent.remainingDistance <= agent.stoppingDistance);
+        //    PathRenderer.ResetPath();
+        //}
 
-        private IEnumerator DrawPath()
-        {
-            while (true)
-            {
-                if (agent.hasPath)
-                {
-                    PathRenderer.DrawPath(agent.path.corners);
-                }
-                yield return new WaitForSeconds(0.25f);
-            }
-        }
+        //private IEnumerator DrawPath()
+        //{
+        //    while (true)
+        //    {
+        //        if (agent.hasPath)
+        //        {
+        //            PathRenderer.DrawPath(agent.path.corners);
+        //        }
+        //        yield return new WaitForSeconds(0.25f);
+        //    }
+        //}
     }
 }

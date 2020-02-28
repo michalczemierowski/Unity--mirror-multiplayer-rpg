@@ -33,7 +33,8 @@ namespace MULTIPLAYER_GAME.Client
         [ClientRpc]
         void RpcSetDestination(Vector3 destination)
         {
-            player.SetPath(destination);
+            agent.SetDestination(destination);
+            //player.SetPath(destination);
             if (isLocalPlayer)
             {
                 player.SetIndicator(agent.destination);
