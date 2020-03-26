@@ -3,15 +3,16 @@
  * https://github.com/michalczemierowski
 */
 
+using MULTIPLAYER_GAME.Entities;
 using UnityEngine;
 
-namespace MULTIPLAYER_GAME.Inventory
+namespace MULTIPLAYER_GAME.Inventory.Items
 {
     [CreateAssetMenu(fileName = "Weapon_0", menuName = "Weapon")]
-    public class Weapon : Item
+    public class Weapon : Equipment
     {
         [Header("Weapon data")]
-        public float Damage;
+        public int Damage;
         public float attackRange;
         public float attackCooldown;
         public float cantMoveTime;

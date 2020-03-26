@@ -3,22 +3,19 @@
  * https://github.com/michalczemierowski
 */
 
-using System.Collections;
 using UnityEngine;
 
 public class PathRenderer : MonoBehaviour
 {
-    public static PathRenderer Instance;
+    public static PathRenderer Instance;                                    // singleton
 
-    #region  Private variables
+    #region //======            VARIABLES           ======\\
 
-    LineRenderer lineRenderer;
+    LineRenderer lineRenderer;                                              // line renderer reference
 
     #endregion
 
-
-
-    #region  Unity methods
+    #region //======            MONOBEHAVIOURS           ======\\
 
     private void Awake()
     {
@@ -34,12 +31,14 @@ public class PathRenderer : MonoBehaviour
 
     #endregion
 
+    #region //======            PATH METHODS           ======\\
+
     public static void DrawPath(Vector3[] path)
     {
         Instance.lineRenderer.positionCount = path.Length;
         for (int i = 0; i < path.Length; i++)
         {
-            Instance.lineRenderer.SetPosition(i, path[i] + new Vector3(0, 0.2f, 0));
+            Instance.lineRenderer.SetPosition(i, path[i] + new Vector3(0, 0.3f, 0));
         }
     }
 
@@ -48,4 +47,6 @@ public class PathRenderer : MonoBehaviour
     {
         Instance.lineRenderer.positionCount = 0;
     }
+
+    #endregion
 }

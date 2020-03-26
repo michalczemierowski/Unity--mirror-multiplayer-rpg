@@ -7,6 +7,6 @@ namespace MULTIPLAYER_GAME.Interfaces
 {
     public interface IDamageable
     {
-        void Damage(int attackerID, float value);
+        void Damage(uint attackerID, int value);
     }
 }

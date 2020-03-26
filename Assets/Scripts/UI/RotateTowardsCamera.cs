@@ -5,17 +5,20 @@
 
 using UnityEngine;
 
+/// <summary>
+/// Rotate object towards camera
+/// </summary>
 namespace MULTIPLAYER_GAME.Utils
 {
     public class RotateTowardsCamera : MonoBehaviour
     {
-        #region  Private variables
+        #region //======            VARIABLES           ======\\
 
         private Camera m_Camera;
 
         #endregion
 
-        #region  Unity methods
+        #region //======            MONOBEHAVIOURS           ======\\
 
         private void Start()
         {

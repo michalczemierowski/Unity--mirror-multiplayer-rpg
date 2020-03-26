@@ -24,7 +24,7 @@ public class NetworkStartPositionInspector : Editor
         Vector3 position = networkStartPosition.transform.position;
         if (lastPosition != position)
         {
-            networkStartPosition.gameObject.name = $"Entity Spawn Position [ x:{position.x}, z:{position.z} ]";
+            networkStartPosition.gameObject.name = $"Player Spawn Position [ x:{position.x}, z:{position.z} ]";
             lastPosition = position;
         }
     }

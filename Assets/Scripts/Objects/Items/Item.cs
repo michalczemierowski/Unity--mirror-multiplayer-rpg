@@ -3,16 +3,26 @@
  * https://github.com/michalczemierowski
 */
 
+using MULTIPLAYER_GAME.Entities;
+using MULTIPLAYER_GAME.Interfaces;
 using UnityEngine;
 
-namespace MULTIPLAYER_GAME.Inventory
+/*
+ * Base class for all items, equipment etc.
+ */
+
+namespace MULTIPLAYER_GAME.Inventory.Items
 {
     [CreateAssetMenu(fileName = "Item_0", menuName = "Item")]
     public class Item : ScriptableObject
     {
         [Header("Item data")]
-        public int ID;
+        public short ID;
         public Sprite icon;
-        // TODO
+
+        public virtual void UseItem(Vector2Byte position)
+        {
+            Player.localPlayer.CmdUseItem(position);
+        }
     }
 }

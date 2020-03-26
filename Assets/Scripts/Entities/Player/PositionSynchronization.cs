@@ -30,13 +30,27 @@ namespace MULTIPLAYER_GAME.Client
             RpcSetDestination(destination);
         }
 
+        [Command]
+        public void CmdResetPath()
+        {
+            agent.ResetPath();
+            RpcResetPath();
+        }
+
+        [ClientRpc]
+        public void RpcResetPath()
+        {
+            agent.ResetPath();
+        }
+
         [ClientRpc]
         void RpcSetDestination(Vector3 destination)
         {
             agent.SetDestination(destination);
-            //player.SetPath(destination);
+
             if (isLocalPlayer)
             {
+                player.SetPath(destination);
                 player.SetIndicator(agent.destination);
             }
         }

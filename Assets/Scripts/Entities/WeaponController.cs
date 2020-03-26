@@ -6,6 +6,7 @@
 using Mirror;
 using MULTIPLAYER_GAME.Entities;
 using MULTIPLAYER_GAME.Inventory;
+using MULTIPLAYER_GAME.Inventory.Items;
 using MULTIPLAYER_GAME.Systems;
 using UnityEngine;
 
@@ -13,11 +14,17 @@ namespace MULTIPLAYER_GAME.Client
 {
     public class WeaponController : NetworkBehaviour
     {
-        public float cooldown { get; set; }
-        Player player;
+        public float cooldown { get; set; }                     // attack cooldown
+        Player player;                                          // Player reference
 
+        #region //======            CMD | RPC           ======\\
+
+        /// <summary>
+        /// [Command] Send command to fire at target entity
+        /// </summary>
+        /// <param name="targetEntityID">target entity ID</param>
         [Command]
-        public void CmdFireAtTarget(int targetEntityID)
+        public void CmdFireAtTarget(uint targetEntityID)
         {
             if (cooldown <= 0)
             {
@@ -31,26 +38,22 @@ namespace MULTIPLAYER_GAME.Client
 
                     if (!targetEntity) return;
 
-                    RpcFireAtTarget(player.ID, targetEntityID, weapon.ID);
-                    cooldown = weapon.attackCooldown;
-
-                    // bullet
-                    BulletController bulletController = Instantiate(weapon.bulletPrefab, transform.position, Quaternion.identity).GetComponent<BulletController>();
-
-                    bulletController.isServer = true;
-                    bulletController.attackerID = player.ID;
-                    bulletController.target = targetEntity.transform;
-                    bulletController.damage = weapon.Damage;
-                    bulletController.speed = weapon.bulletSpeed;
+                    AttackSystem.Instance.ServerFireAtTarget(player.ID, targetEntity.ID, weapon.ID);
                 }
             }
         }
 
+        /// <summary>
+        /// [ClientRpc] Fire at target entity
+        /// </summary>
+        /// <param name="entityID">attacker entity ID</param>
+        /// <param name="targetEntityID">target entity ID</param>
+        /// <param name="weaponID">attacker weapon ID</param>
         [ClientRpc]
-        public void RpcFireAtTarget(int entityID, int targetEntityID, int weaponID)
+        public void RpcFireAtTarget(uint entityID, uint targetEntityID, short weaponID)
         {
             Entity entity = ObjectDatabase.GetEntity(entityID);
-            Weapon weapon = entity.usedWeapon;
+            Weapon weapon = ObjectDatabase.GetWeapon(weaponID);
 
             player.SetTrigger(weapon.animationTrigger);
 
@@ -60,17 +63,20 @@ namespace MULTIPLAYER_GAME.Client
 
             RotateTowards(targetEntity.transform.position);
 
-            bulletController.attackerID = player.ID;
-            bulletController.target = targetEntity.transform;
-            bulletController.damage = weapon.Damage;
-            bulletController.speed = weapon.bulletSpeed;
+            //bulletController.target = targetEntity.transform;
+            //bulletController.speed = weapon.bulletSpeed;
 
-            entity.StartCoroutine(entity.BlockMovement(weapon.cantMoveTime));
+            entity.BlockMovement(weapon.cantMoveTime);
         }
 
+        /// <summary>
+        /// [Command] Send command to melee attack target entity
+        /// </summary>
+        /// <param name="targetEntityID">target entity ID</param>
         [Command]
-        public void CmdMeleeAttack(int targetEntityID)
+        public void CmdMeleeAttack(uint targetEntityID)
         {
+#if SERVER
             if (cooldown <= 0)
             {
                 if (!player) return;
@@ -92,21 +98,31 @@ namespace MULTIPLAYER_GAME.Client
                     }
                 }
             }
+#endif
         }
 
+        /// <summary>
+        /// [ClientRpc] Melee attack target entity
+        /// </summary>
+        /// <param name="entityID">attacker entity ID</param>
+        /// <param name="targetEntityID">target entity ID</param>
+        /// <param name="weaponID">attacker weapon ID</param>
         [ClientRpc]
-        public void RpcMeleeAttack(int entityID, int targetEntityID, int weaponID)
+        public void RpcMeleeAttack(uint entityID, uint targetEntityID, short weaponID)
         {
             Entity entity = ObjectDatabase.GetEntity(entityID);
-            // TODO: USE WEAPON ID
-            Weapon weapon = entity.usedWeapon;
+            Weapon weapon = ObjectDatabase.GetWeapon(weaponID);
             Entity targetEntity = ObjectDatabase.GetEntity(targetEntityID);
 
             RotateTowards(targetEntity.transform.position);
 
             entity.SetTrigger(weapon.animationTrigger);
-            entity.StartCoroutine(entity.BlockMovement(weapon.cantMoveTime));
+            entity.BlockMovement(weapon.cantMoveTime);
         }
+
+        #endregion
+
+        #region //======            MONOBEHAVIOURS           ======\\
 
         private void Update()
         {
@@ -119,6 +135,12 @@ namespace MULTIPLAYER_GAME.Client
             player = GetComponent<Player>();
         }
 
+        #endregion
+
+        /// <summary>
+        ///  Rotate player towards position
+        /// </summary>
+        /// <param name="position"></param>
         private void RotateTowards(Vector3 position)
         {
             var lookPos = position - transform.position;
